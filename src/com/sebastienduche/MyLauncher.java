@@ -28,8 +28,8 @@ public abstract class MyLauncher {
 					File downloadDirectory = server.downloadVersion();
 
 					if (downloadDirectory != null && downloadDirectory.isDirectory()) {
-						final File[] fList = downloadDirectory.listFiles();
-						install(fList);
+						final File[] files = downloadDirectory.listFiles();
+						install(files, downloadDirectory);
 					} else {
 						server.debug("ERROR: Missing download directory");
 					}
@@ -48,7 +48,7 @@ public abstract class MyLauncher {
         }
 	}
 
-	public abstract void install(File[] files);
+	public abstract void install(File[] files, File directoryToDelete);
 
 	private static void showException(Exception e) {
 		StackTraceElement[] st = e.getStackTrace();
