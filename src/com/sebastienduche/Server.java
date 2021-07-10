@@ -170,6 +170,9 @@ public abstract class Server implements Runnable {
 	}
 
 	private List<String> getLibFiles() {
+		if (!new File("./" + LIB_DIRECTORY).exists()) {
+			return new ArrayList<>();
+		}
 		try {
 			return Files.walk(Path.of("./" + LIB_DIRECTORY), 1, FileVisitOption.FOLLOW_LINKS)
 					.map(Path::toFile)
