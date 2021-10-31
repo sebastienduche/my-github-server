@@ -1,8 +1,16 @@
 package com.sebastienduche;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 
 /**
  * <p>Titre : Cave à vin</p>
@@ -10,8 +18,8 @@ import java.awt.*;
  * <p>Copyright : Copyright (c) 2003</p>
  * <p>Société : Seb Informatique</p>
  * @author Sébastien Duché
- * @version 0.2
- * @since 08/06/18
+ * @version 0.3
+ * @since 31/10/21
  */
 class MyLauncherLoading extends JDialog {
 
@@ -58,7 +66,6 @@ class MyLauncherLoading extends JDialog {
 	 * @param titre String
 	 */
 	public void setText(String txt, String titre) {
-
 		label.setText(txt);
 		if (titre != null){
 			setTitle(titre);
@@ -73,7 +80,6 @@ class MyLauncherLoading extends JDialog {
 	 * @param i int
 	 */
 	public void setValue(int i) {
-
 		jProgressBar.setValue(i);
 		repaint();
 	}

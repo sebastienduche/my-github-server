@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
  * Copyright : Copyright (c) 2011
  * Société : Seb Informatique
  * @author Sébastien Duché
- * @version 3.1
- * @since 11/02/21
+ * @version 3.2
+ * @since 10/10/21
  */
 
 public abstract class Server implements Runnable {
-
+	private static final String VERSION = "2";
 	private final String gitHubUrl;
 	private final String versionFileName;
 	private final String mainJarName;
@@ -68,6 +68,7 @@ public abstract class Server implements Runnable {
 
 	@Override
 	public void run() {
+		debug("Server version: " + VERSION);
 		if (Action.GET_VERSION.equals(action)) {
 			checkVersion();
 		} else if (Action.DOWNLOAD.equals(action)) {
@@ -132,6 +133,7 @@ public abstract class Server implements Runnable {
 		} catch (IOException e) {
 			showException(e);
 		}
+		debug("Checking version from GitHub Done");
 	}
 
 	public File downloadVersion() {
@@ -141,6 +143,7 @@ public abstract class Server implements Runnable {
 			downloadDirectory.deleteOnExit();
 			return null;
 		}
+		debug("Downloading version from GitHub Done");
 		return downloadDirectory;
 	}
 
@@ -170,11 +173,12 @@ public abstract class Server implements Runnable {
 	}
 
 	private List<String> getLibFiles() {
-		if (!new File("./" + LIB_DIRECTORY).exists()) {
+		String path = "." + File.separator + LIB_DIRECTORY;
+		if (!new File(path).exists()) {
 			return new ArrayList<>();
 		}
 		try {
-			return Files.walk(Path.of("./" + LIB_DIRECTORY), 1, FileVisitOption.FOLLOW_LINKS)
+			return Files.walk(Path.of(path), 1, FileVisitOption.FOLLOW_LINKS)
 					.map(Path::toFile)
 					.filter(File::isFile)
 					.map(File::getName)
@@ -275,12 +279,12 @@ public abstract class Server implements Runnable {
 				}
 			}
 		} catch (IOException e) {
-			debug("Server IO Exception.");
+			debug("Server IO Exception:");
 			showException(e);
 			download.dispose();
 			downloadError = true;
 		} catch (Exception e) {
-			debug("Exception.");
+			debug("Exception:");
 			showException(e);
 			download.dispose();
 			downloadError = true;
@@ -337,11 +341,6 @@ public abstract class Server implements Runnable {
 		return result.toString();
 	}
 
-	/**
-	 * debug
-	 *
-	 * @param sText String
-	 */
 	public void debug(String sText) {
 		try {
 			if (debugFile == null) {
@@ -363,10 +362,6 @@ public abstract class Server implements Runnable {
 		catch (Exception ignored) {}
 	}
 
-	/**
-	 * showException
-	 * @param e Exception
-	 */
 	private void showException(Exception e) {
 		StackTraceElement[] st = e.getStackTrace();
 		String error = "";
