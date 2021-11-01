@@ -105,6 +105,7 @@ public abstract class Server implements Runnable {
 	}
 
 	public void checkVersion() {
+		debug("Server version: " + VERSION);
 		debug("Checking version from GitHub...");
 		serverVersion = "";
 		action = Action.NONE;
@@ -175,6 +176,7 @@ public abstract class Server implements Runnable {
 	private List<String> getLibFiles() {
 		String path = "." + File.separator + LIB_DIRECTORY;
 		if (!new File(path).exists()) {
+			debug("Inexisting path " + path);
 			return new ArrayList<>();
 		}
 		try {
