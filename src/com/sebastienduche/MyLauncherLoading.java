@@ -13,38 +13,25 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 
 /**
- * <p>Titre : Cave à vin</p>
- * <p>Description : Votre description</p>
- * <p>Copyright : Copyright (c) 2003</p>
- * <p>Société : Seb Informatique</p>
+ * Title : My-GitHub-Server
+ * Description : Votre description
+ * Copyright : Copyright (c) 2022
+ * Société : Seb Informatique
  * @author Sébastien Duché
- * @version 0.3
- * @since 31/10/21
  */
 class MyLauncherLoading extends JDialog {
 
 	private static final long serialVersionUID = -2314335792718752038L;
-	private JLabel label;
+	private final JLabel label;
 	private final JProgressBar jProgressBar = new JProgressBar();
-	private final GridBagLayout gridBagLayout = new GridBagLayout();
 
 	/**
-	 * Loading: Constructeur avec texte de la fenêtre.
+	 * Initialise a small window with a line of text and the title "Loading..."
 	 *
 	 * @param txt String
 	 */
 	MyLauncherLoading(String txt) {
 		super(new JFrame(), "", false);
-		jbInit(txt);
-	}
-
-	/**
-	 * jbInit: Fonction d'initialisation avec texte de la fenêtre.
-	 *
-	 * @param txt String
-	 */
-	private void jbInit(String txt) {
-
 		setSize(270, 75);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -53,6 +40,7 @@ class MyLauncherLoading extends JDialog {
 		label = new JLabel(txt, SwingConstants.CENTER);
 		jProgressBar.setMinimum(0);
 		jProgressBar.setMaximum(100);
+		GridBagLayout gridBagLayout = new GridBagLayout();
 		getContentPane().setLayout(gridBagLayout);
 		getContentPane().add(label, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 20));
 		getContentPane().add(jProgressBar, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 0, 1, 0), 270, 4));
@@ -60,15 +48,15 @@ class MyLauncherLoading extends JDialog {
 	}
 
 	/**
-	 * setText: Fonction pour remplacer le texte de la fenêtre.
+	 * Allow to change text and title when the dialog is visible
 	 *
-	 * @param txt String
-	 * @param titre String
+	 * @param text String
+	 * @param title String: can be null
 	 */
-	public void setText(String txt, String titre) {
-		label.setText(txt);
-		if (titre != null){
-			setTitle(titre);
+	public void setText(String text, String title) {
+		label.setText(text);
+		if (title != null) {
+			setTitle(title);
 		}
 		repaint();
 	}

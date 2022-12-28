@@ -23,13 +23,11 @@ import java.util.stream.Collectors;
 
 /**
  *
- * Titre : Cave à vin
+ * Title : My-GitHub-Server
  * Description : Votre description
- * Copyright : Copyright (c) 2011
+ * Copyright : Copyright (c) 2022
  * Société : Seb Informatique
  * @author Sébastien Duché
- * @version 3.2
- * @since 10/10/21
  */
 
 public abstract class Server implements Runnable {

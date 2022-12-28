@@ -8,13 +8,11 @@ import static javax.swing.JOptionPane.showMessageDialog;
 
 /**
  *
- * <p>Titre : Cave à vin</p>
- * <p>Description : Votre description</p>
- * <p>Copyright : Copyright (c) 2011</p>
- * <p>Société : Seb Informatique</p>
+ * Title : My-GitHub-Server
+ * Description : Votre description
+ * Copyright : Copyright (c) 2022
+ * Société : Seb Informatique
  * @author Sébastien Duché
- * @version 1.6
- * @since 08/07/21
  */
 public abstract class MyLauncher {
 
