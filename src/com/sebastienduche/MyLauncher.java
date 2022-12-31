@@ -2,61 +2,75 @@ package com.sebastienduche;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 /**
- *
  * Title : My-GitHub-Server
  * Description : Votre description
  * Copyright : Copyright (c) 2022
  * Société : Seb Informatique
+ *
  * @author Sébastien Duché
  */
 public abstract class MyLauncher {
 
-	public MyLauncher(Server server, String lacalVersion, String mainJar) {
+    public MyLauncher(Server server, String localVersion, String mainJar) {
 
-		Thread updateThread = new Thread(() -> {
-					server.checkVersion();
-					if (!server.hasAvailableUpdate(lacalVersion)) {
-						return;
-					}
-					File downloadDirectory = server.downloadVersion();
+        Thread updateThread = new Thread(() -> {
+            server.debug("Start update thread");
+            server.checkVersion();
+            if (!server.hasAvailableUpdate(localVersion)) {
+                startApplication(server, mainJar);
+                return;
+            }
+            File downloadDirectory = server.downloadVersion();
 
-					if (downloadDirectory != null && downloadDirectory.isDirectory()) {
-						final File[] files = downloadDirectory.listFiles();
-						install(files, downloadDirectory);
-					} else {
-						server.debug("ERROR: Missing download directory");
-					}
-					System.exit(0);
+            if (downloadDirectory != null && downloadDirectory.isDirectory()) {
+                final File[] files = downloadDirectory.listFiles();
+                install(files, downloadDirectory);
+                startApplication(server, mainJar);
+            } else {
+                server.debug("ERROR: Missing download directory");
+            }
         });
 
+//        try {
+//            server.debug("Create process with " + mainJar);
+//            var pb = new ProcessBuilder("java", "-Dfile.encoding=UTF8", "-jar", mainJar);
+//            pb.redirectErrorStream(true);
+//            Process p = pb.start();
+//            p.waitFor();
+        Runtime.getRuntime().addShutdownHook(updateThread);
+//            updateThread.start();
+//        } catch (IOException | InterruptedException ex) {
+//            showException(ex);
+//        }
+    }
+
+    private void startApplication(Server server, String mainJar) {
         try {
-					var pb = new ProcessBuilder("java","-Dfile.encoding=UTF8","-jar", mainJar);
-					pb.redirectErrorStream(true);
-					Process p = pb.start();
-					p.waitFor(10, TimeUnit.SECONDS);
-					Runtime.getRuntime().addShutdownHook(updateThread);
-					updateThread.start();
+            server.debug("Create process with " + mainJar);
+            var pb = new ProcessBuilder("java", "-Dfile.encoding=UTF8", "-jar", mainJar);
+            pb.redirectErrorStream(true);
+            Process p = pb.start();
+            p.waitFor();
         } catch (IOException | InterruptedException ex) {
             showException(ex);
         }
-	}
+    }
 
-	public abstract void install(File[] files, File directoryToDelete);
+    public abstract void install(File[] files, File directoryToDelete);
 
-	private static void showException(Exception e) {
-		StackTraceElement[] st = e.getStackTrace();
-		String error = "";
-		for (StackTraceElement elem : st) {
-			error = error.concat("\n" + elem);
-		}
-		showMessageDialog(null, e.toString(), "Error", ERROR_MESSAGE);
-		System.exit(999);
-	}
+    private static void showException(Exception e) {
+        StackTraceElement[] st = e.getStackTrace();
+        String error = "";
+        for (StackTraceElement elem : st) {
+            error = error.concat("\n" + elem);
+        }
+        showMessageDialog(null, e.toString(), "Error", ERROR_MESSAGE);
+        System.exit(999);
+    }
 
 }

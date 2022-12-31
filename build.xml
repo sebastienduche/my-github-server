@@ -7,9 +7,9 @@
     <property name="dir.jarfile" value="${dir.buildfile}"/>
     <target name="create_run_jar">
         <mkdir dir="./Build"/>
-        <jar destfile="Build/GitHubServer-2.2.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="Build/GitHubServer-2.3.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Class-Path" value="." />
+                <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="./bin/production/my-github-server">
             </fileset>
