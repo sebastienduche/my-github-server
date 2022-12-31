@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 
 public abstract class Server implements Runnable {
-	private static final String VERSION = "2";
+	private static final String VERSION = "2.2";
 	private final String gitHubUrl;
 	private final String versionFileName;
 	private final String mainJarName;
@@ -174,7 +174,7 @@ public abstract class Server implements Runnable {
 	private List<String> getLibFiles() {
 		String path = "." + File.separator + LIB_DIRECTORY;
 		if (!new File(path).exists()) {
-			debug("Inexisting path " + path);
+			debug("Non existing path " + path);
 			return new ArrayList<>();
 		}
 		try {
@@ -356,7 +356,7 @@ public abstract class Server implements Runnable {
 				String sDate = oCal.get(Calendar.DATE) + "-" + (oCal.get(Calendar.MONTH) + 1) + "-" + oCal.get(Calendar.YEAR);
 				debugFile = new FileWriter(new File(sDir, "DebugFtp-" + sDate + ".log"), true);
 			}
-			debugFile.write("[" + Calendar.getInstance().getTime().toString() + "]: " + sText + "\n");
+			debugFile.write("[" + Calendar.getInstance().getTime() + "]: " + sText + "\n");
 			debugFile.flush();
 		}
 		catch (Exception ignored) {}

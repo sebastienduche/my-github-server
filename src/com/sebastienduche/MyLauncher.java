@@ -2,6 +2,7 @@ package com.sebastienduche;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -38,7 +39,7 @@ public abstract class MyLauncher {
 					var pb = new ProcessBuilder("java","-Dfile.encoding=UTF8","-jar", mainJar);
 					pb.redirectErrorStream(true);
 					Process p = pb.start();
-					p.waitFor();
+					p.waitFor(10, TimeUnit.SECONDS);
 					Runtime.getRuntime().addShutdownHook(updateThread);
 					updateThread.start();
         } catch (IOException | InterruptedException ex) {
