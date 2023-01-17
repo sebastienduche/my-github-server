@@ -1,7 +1,9 @@
 package com.sebastienduche;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -23,6 +25,7 @@ public abstract class MyLauncher {
             server.checkVersion();
             if (!server.hasAvailableUpdate(localVersion)) {
                 startApplication(server, mainJar);
+                shutDown();
                 return;
             }
             File downloadDirectory = server.downloadVersion();
@@ -34,19 +37,14 @@ public abstract class MyLauncher {
             } else {
                 server.debug("ERROR: Missing download directory");
             }
+            shutDown();
         });
 
-//        try {
-//            server.debug("Create process with " + mainJar);
-//            var pb = new ProcessBuilder("java", "-Dfile.encoding=UTF8", "-jar", mainJar);
-//            pb.redirectErrorStream(true);
-//            Process p = pb.start();
-//            p.waitFor();
         Runtime.getRuntime().addShutdownHook(updateThread);
-//            updateThread.start();
-//        } catch (IOException | InterruptedException ex) {
-//            showException(ex);
-//        }
+    }
+
+    private void shutDown() {
+        Runtime.getRuntime().halt(0);
     }
 
     private void startApplication(Server server, String mainJar) {
@@ -55,7 +53,13 @@ public abstract class MyLauncher {
             var pb = new ProcessBuilder("java", "-Dfile.encoding=UTF8", "-jar", mainJar);
             pb.redirectErrorStream(true);
             Process p = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                server.debug(line);
+            }
             p.waitFor();
+            p.destroy();
         } catch (IOException | InterruptedException ex) {
             showException(ex);
         }
