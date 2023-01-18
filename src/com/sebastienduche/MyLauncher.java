@@ -43,6 +43,8 @@ public abstract class MyLauncher {
         Runtime.getRuntime().addShutdownHook(updateThread);
     }
 
+    public abstract void install(File[] files, File directoryToDelete);
+
     private void shutDown() {
         Runtime.getRuntime().halt(0);
     }
@@ -64,8 +66,6 @@ public abstract class MyLauncher {
             showException(ex);
         }
     }
-
-    public abstract void install(File[] files, File directoryToDelete);
 
     private static void showException(Exception e) {
         StackTraceElement[] st = e.getStackTrace();

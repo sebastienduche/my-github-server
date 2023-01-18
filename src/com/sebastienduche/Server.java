@@ -77,31 +77,6 @@ public abstract class Server implements Runnable {
         }
     }
 
-    private File downloadFromServer() {
-        action = Action.NONE;
-        downloadError = false;
-        File downloadDirectory = null;
-        try {
-            downloadDirectory = new File(DOWNLOAD_DIRECTORY);
-            if (!downloadDirectory.exists()) {
-                Files.createDirectory(downloadDirectory.toPath());
-            }
-
-            downloadError = downloadFromGitHub();
-        } catch (IOException e) {
-            showException(e);
-            downloadError = true;
-        }
-        return downloadDirectory;
-    }
-
-    private File downloadVersionFileTxt() throws IOException {
-        final File version = File.createTempFile("Version", "txt");
-        version.deleteOnExit();
-        downloadFileFromGitHub(versionFileName, version);
-        return version;
-    }
-
     public void checkVersion() {
         debug("Server version: " + VERSION);
         debug("Checking version from GitHub...");
@@ -171,6 +146,89 @@ public abstract class Server implements Runnable {
         return (serverVersion.compareTo(localVersion) > 0);
     }
 
+    public String getGitHubUrl() {
+        return gitHubUrl;
+    }
+
+    public String getVersionFileName() {
+        return versionFileName;
+    }
+
+    public String getMainJarName() {
+        return mainJarName;
+    }
+
+    public String getDebugFileName() {
+        return debugFileName;
+    }
+
+    public void debug(String sText) {
+        try {
+            if (debugFile == null) {
+                String sDir = System.getProperty("user.home");
+                if (!sDir.isEmpty()) {
+                    sDir += File.separator + debugFileName;
+                }
+                File f_obj = new File(sDir);
+                if (!f_obj.exists()) {
+                    Files.createDirectory(f_obj.toPath());
+                }
+                Calendar oCal = Calendar.getInstance();
+                String sDate = oCal.get(Calendar.DATE) + "-" + (oCal.get(Calendar.MONTH) + 1) + "-" + oCal.get(Calendar.YEAR);
+                debugFile = new FileWriter(new File(sDir, "DebugFtp-" + sDate + ".log"), true);
+            }
+            debugFile.write("[" + Calendar.getInstance().getTime() + "]: " + sText + "\n");
+            debugFile.flush();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void downloadFileFromGitHub(String name, File destination) throws IOException {
+        URL url = new URL(gitHubUrl + name);
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        Map<String, List<String>> header = http.getHeaderFields();
+        while (isRedirected(header)) {
+            String link = header.get("Location").get(0);
+            url = new URL(link);
+            http = (HttpURLConnection) url.openConnection();
+            header = http.getHeaderFields();
+        }
+
+        try (InputStream input = http.getInputStream();
+             var output = new FileOutputStream(destination)) {
+            int n;
+            byte[] buffer = new byte[4096];
+            while ((n = input.read(buffer)) != -1) {
+                output.write(buffer, 0, n);
+            }
+        }
+    }
+
+    private File downloadFromServer() {
+        action = Action.NONE;
+        downloadError = false;
+        File downloadDirectory = null;
+        try {
+            downloadDirectory = new File(DOWNLOAD_DIRECTORY);
+            if (!downloadDirectory.exists()) {
+                Files.createDirectory(downloadDirectory.toPath());
+            }
+
+            downloadFromGitHub();
+        } catch (IOException e) {
+            showException(e);
+            downloadError = true;
+        }
+        return downloadDirectory;
+    }
+
+    private File downloadVersionFileTxt() throws IOException {
+        final File version = File.createTempFile("Version", "txt");
+        version.deleteOnExit();
+        downloadFileFromGitHub(versionFileName, version);
+        return version;
+    }
+
     private List<String> getLibFiles() {
         String path = "." + File.separator + LIB_DIRECTORY;
         if (!new File(path).exists()) {
@@ -189,7 +247,7 @@ public abstract class Server implements Runnable {
         return new ArrayList<>();
     }
 
-    private boolean downloadFromGitHub() {
+    private void downloadFromGitHub() {
         MyLauncherLoading download;
         try {
             download = new MyLauncherLoading("Downloading...");
@@ -197,7 +255,7 @@ public abstract class Server implements Runnable {
             download.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return;
         }
 
         downloadError = false;
@@ -293,28 +351,6 @@ public abstract class Server implements Runnable {
             download.setValue(100);
             download.dispose();
         }
-        return downloadError;
-    }
-
-    public void downloadFileFromGitHub(String name, File destination) throws IOException {
-        URL url = new URL(gitHubUrl + name);
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        Map<String, List<String>> header = http.getHeaderFields();
-        while (isRedirected(header)) {
-            String link = header.get("Location").get(0);
-            url = new URL(link);
-            http = (HttpURLConnection) url.openConnection();
-            header = http.getHeaderFields();
-        }
-
-        try (InputStream input = http.getInputStream();
-             var output = new FileOutputStream(destination)) {
-            int n;
-            byte[] buffer = new byte[4096];
-            while ((n = input.read(buffer)) != -1) {
-                output.write(buffer, 0, n);
-            }
-        }
     }
 
     private static byte[] createChecksum(String filename) throws Exception {
@@ -340,27 +376,6 @@ public abstract class Server implements Runnable {
             result.append(Integer.toString((v & 0xff) + 0x100, 16).substring(1));
         }
         return result.toString();
-    }
-
-    public void debug(String sText) {
-        try {
-            if (debugFile == null) {
-                String sDir = System.getProperty("user.home");
-                if (!sDir.isEmpty()) {
-                    sDir += File.separator + debugFileName;
-                }
-                File f_obj = new File(sDir);
-                if (!f_obj.exists()) {
-                    Files.createDirectory(f_obj.toPath());
-                }
-                Calendar oCal = Calendar.getInstance();
-                String sDate = oCal.get(Calendar.DATE) + "-" + (oCal.get(Calendar.MONTH) + 1) + "-" + oCal.get(Calendar.YEAR);
-                debugFile = new FileWriter(new File(sDir, "DebugFtp-" + sDate + ".log"), true);
-            }
-            debugFile.write("[" + Calendar.getInstance().getTime() + "]: " + sText + "\n");
-            debugFile.flush();
-        } catch (Exception ignored) {
-        }
     }
 
     private void showException(Exception e) {
@@ -425,21 +440,5 @@ public abstract class Server implements Runnable {
         private boolean isForLibDirectory() {
             return forLibDirectory;
         }
-    }
-
-    public String getGitHubUrl() {
-        return gitHubUrl;
-    }
-
-    public String getVersionFileName() {
-        return versionFileName;
-    }
-
-    public String getMainJarName() {
-        return mainJarName;
-    }
-
-    public String getDebugFileName() {
-        return debugFileName;
     }
 }
